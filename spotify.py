@@ -130,8 +130,6 @@ def assign_mood(track_data):
         else:
             track['mood'] = 'Neutral'
     return track_data
-
-
 def process_covid_data(covid_data):
     processed_data = []
     for record in covid_data:
