@@ -6,7 +6,7 @@ import billboard
 import re
 import matplotlib.pyplot as plt
 import csv
-#import spotify.py
+from spotify import *
 
 from bs4 import BeautifulSoup
 import requests
@@ -69,7 +69,7 @@ def billboard_hot_100(date, cur, conn):
         song_rank = chart[i].rank
         cur.execute("SELECT ID FROM song_ids WHERE Title = ? AND Artist = ?", (song_title, song_artist))
         song_id_result = cur.fetchone()
-
+        song_list.append((song_title, song_artist, song_rank))
         if song_id_result:
             song_id = song_id_result[0]
             # Insert the data into the Billboard_Hot_100_{year} table
@@ -88,14 +88,17 @@ def main():
     # create_data_base --> create database for billboard data
     database_name = 'Billboard_Hot_100_Database'
     cur, conn = create_data_base(database_name)
+    sp = get_spotify_client(cid, secret, "https://google.com/")
     # billboard_hot_100()
     date_list = ['2019-12-01', '2020-12-01']
     # date_list = ['2019-12-01', '2020-04-01']
     for date in date_list:
         hot_100_songs = billboard_hot_100(date, cur, conn)
-        print(hot_100_songs)
+        data = enhance_track_data(sp, hot_100_songs)
+        print(data)
     
-
+    
+    
 main()
 
 
