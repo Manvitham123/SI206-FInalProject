@@ -91,9 +91,6 @@ def get_track_features(id):
             "loudness": loudness,"speechiness": speechiness, "tempo": tempo, "time_signature":time_signature}
     return track
 
-def get_audio_features(sp, track_ids):
-    features = sp.audio_features(tracks=track_ids)
-    return features
 
 
 import requests
@@ -105,6 +102,9 @@ def fetch_covid_data(api_url, params=None):
     else:
         return None
     
+def get_audio_features(sp, track_ids):
+    features = sp.audio_features(tracks=track_ids)
+    return features
 
 def process_audio_features(audio_features):
     processed_data = []
@@ -130,6 +130,54 @@ def assign_mood(track_data):
         else:
             track['mood'] = 'Neutral'
     return track_data
+
+def get_track_id(sp, title, artist):
+    """
+    Fetch the Spotify track ID for a given song title and artist.
+
+    Args:
+    sp: Spotify API client instance.
+    title (str): The title of the song.
+    artist (str): The name of the artist.
+
+    Returns:
+    str: The Spotify track ID, or None if not found.
+    """
+    query = f'track:{title} artist:{artist}'
+    results = sp.search(q=query, type='track', limit=1)
+
+    items = results['tracks']['items']
+    if items:
+        # Assuming the first search result is the correct one
+        return items[0]['id']
+    else:
+        return None
+
+
+def enhance_track_data(sp, track_list):
+    enhanced_data = []
+
+    for title, artist, rank in track_list:
+        track_id = get_track_id(sp, title, artist)
+        audio_features = get_audio_features(sp, [track_id])
+        processed_features = process_audio_features(audio_features)
+
+        if processed_features:
+            track_data = processed_features[0]  # Assuming we get one record per track ID
+            assign_mood([track_data])
+
+            enhanced_data.append((
+                title, 
+                artist, 
+                rank, 
+                track_data['valence'], 
+                track_data['danceability'], 
+                track_data['energy'], 
+                track_data['mood']
+            ))
+
+    return enhanced_data
+"""
 def process_covid_data(covid_data):
     processed_data = []
     for record in covid_data:
@@ -141,7 +189,7 @@ def process_covid_data(covid_data):
         processed_data.append(covid_record)
     return processed_data
 
-    
+  
 def insert_spotify_data(cur,conn, spotify_data):
     cur.execute('''CREATE TABLE IF NOT EXISTS top_songs (
                 id TEXT PRIMARY KEY,
@@ -155,6 +203,7 @@ def insert_spotify_data(cur,conn, spotify_data):
                   (song['id'], song['name'], song['artist'], song['album'], song['release_date']))
     conn.commit()
 
+
 def insert_covid_data(cur,conn, covid_data):
     cur.execute('''CREATE TABLE IF NOT EXISTS covid_data (
                 date TEXT PRIMARY KEY,
@@ -165,16 +214,16 @@ def insert_covid_data(cur,conn, covid_data):
                   (record['date'], record['infections']))
     conn.commit()
 
-
+"""
 def main():
     sp = get_spotify_client(cid, secret, "https://google.com/")
    # json_covid_data = fetch_covid_data("https://api.covidtracking.com")
     json_spotify_data = fetch_top_songs(sp,2020)
-    cur1, conn1 = set_up_database("spotify.db")
+    #cur1, conn1 = set_up_database("spotify.db")
     #cur, conn = set_up_database("covid.db")
     #insert_covid_data(cur, conn, json_covid_data)
-    insert_spotify_data(cur1, conn1, json_spotify_data)
-    conn1.close()
+    #insert_spotify_data(cur1, conn1, json_spotify_data)
+   # conn1.close()
 if __name__ == "__main__":
     main()
    

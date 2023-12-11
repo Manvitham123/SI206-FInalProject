@@ -6,6 +6,7 @@ import billboard
 import re
 import matplotlib.pyplot as plt
 import csv
+#import spotify.py
 
 from bs4 import BeautifulSoup
 import requests
@@ -18,20 +19,56 @@ def create_data_base(database_name):
     return cur, conn
 
 
+def song_table(chart, cur, conn):
+    table_name = f"song_ids"  # concatenate the table name w/ the date variable
+    create_table_query = f"""CREATE TABLE IF NOT EXISTS {table_name} (
+    ID INTEGER PRIMARY KEY,
+    Title TEXT,
+    Artist TEXT,
+    UNIQUE (Title, Artist)
+    )"""
+    cur.execute(create_table_query)
+    cur.execute(f"SELECT MAX(ID) FROM {table_name}")
+    temp = cur.fetchone()[0]
+    print(temp)
+    if not temp:
+        index = 0
+    else:
+        index = int(temp)
+    for i in range(index,index+25):
+        song_title = chart[i].title
+        song_artist = chart[i].artist
+        cur.execute(f"""INSERT OR IGNORE INTO {table_name} (ID, Title, Artist) 
+    VALUES (?, ?, ?)""", (index, song_title, song_artist))
+        conn.commit()
+
+
+
+
+def billboard_hot_100(date, cur, conn):
+
+    year = date[:4]  # Get the full year
+    table_name = f"Billboard_Hot_100_{year}"
+    create_table_query = f"""
+    CREATE TABLE IF NOT EXISTS {table_name} (
+        Rank INTEGER PRIMARY KEY, 
+        SongID INTEGER,
+        FOREIGN KEY(SongID) REFERENCES song_ids(ID)
+    )"""
+    cur.execute(create_table_query)
 def billboard_hot_100(date, cur, conn):
     song_list = []
-    
     chart = billboard.ChartData('hot-100', date)
-
-        # rank, song title, artist
-        # cur --> where you specify what you want it to do
-    year = date[:3]
-    table_name = f"Billboard_Hot_100_{year}"  # concatenate the table name w/ the date variable
-    create_table_query = f"CREATE TABLE IF NOT EXISTS {table_name} (Rank NUMBER PRIMARY KEY, Title TEXT, Artist TEXT)"
+    song_table(chart, cur, conn)
+    year = date[:4]  # Get the full year
+    table_name = f"Billboard_Hot_100_{year}"
+    create_table_query = f"""
+    CREATE TABLE IF NOT EXISTS {table_name} (
+        Rank INTEGER PRIMARY KEY, 
+        SongID INTEGER,
+        FOREIGN KEY(SongID) REFERENCES song_ids(ID)
+    )"""
     cur.execute(create_table_query)
-    # conn.commit()
-
-
     cur.execute(f"SELECT MAX(Rank) FROM {table_name}")
     temp = cur.fetchone()[0]
     print(temp)
@@ -39,20 +76,24 @@ def billboard_hot_100(date, cur, conn):
         index = 0
     else:
         index = int(temp)
-        #   print(index)
-        # info about top 100 songs
-    for i in range(index,index+25):
-        #song_per_date = []
+        print(index)
+
+    for i in range(index, index + 25):
         song_title = chart[i].title
         song_artist = chart[i].artist
-        song_rank = chart[i].rank 
-            # tuple
-        song_list.append((song_title, song_artist, song_rank))
-            #song_list[date] = song_per_date
-        cur.execute(f"INSERT OR IGNORE INTO {table_name} (Rank, Title, Artist) VALUES (?,?,?)",
-            (song_rank, song_title, song_artist)) 
+        song_rank = chart[i].rank
+        cur.execute("SELECT ID FROM song_ids WHERE Title = ? AND Artist = ?", (song_title, song_artist))
+        song_id_result = cur.fetchone()
+
+        if song_id_result:
+            song_id = song_id_result[0]
+            # Insert the data into the Billboard_Hot_100_{year} table
+            cur.execute(f"INSERT OR IGNORE INTO {table_name} (Rank, SongID) VALUES (?, ?)", (song_rank, song_id))
 
         conn.commit()
+
+    # ... (rest of your function)
+
     return song_list
 
        
