@@ -25,7 +25,7 @@ def billboard_hot_100(date, cur, conn):
 
         # rank, song title, artist
         # cur --> where you specify what you want it to do
-    year = date[:3]
+    year = date[:4]
     table_name = f"Billboard_Hot_100_{year}"  # concatenate the table name w/ the date variable
     create_table_query = f"CREATE TABLE IF NOT EXISTS {table_name} (Rank NUMBER PRIMARY KEY, Title TEXT, Artist TEXT)"
     cur.execute(create_table_query)
