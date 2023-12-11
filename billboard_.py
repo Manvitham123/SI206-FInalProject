@@ -20,42 +20,27 @@ def create_data_base(database_name):
 
 
 def song_table(chart, cur, conn):
-    table_name = f"song_ids"  # concatenate the table name w/ the date variable
-    create_table_query = f"""CREATE TABLE IF NOT EXISTS {table_name} (
+    table_name = "song_ids"
+    create_table_query = """
+    CREATE TABLE IF NOT EXISTS song_ids (
     ID INTEGER PRIMARY KEY,
     Title TEXT,
     Artist TEXT,
     UNIQUE (Title, Artist)
     )"""
     cur.execute(create_table_query)
-    cur.execute(f"SELECT MAX(ID) FROM {table_name}")
-    temp = cur.fetchone()[0]
-    print(temp)
-    if not temp:
-        index = 0
-    else:
-        index = int(temp)
-    for i in range(index,index+25):
-        song_title = chart[i].title
-        song_artist = chart[i].artist
-        cur.execute(f"""INSERT OR IGNORE INTO {table_name} (ID, Title, Artist) 
-    VALUES (?, ?, ?)""", (index, song_title, song_artist))
-        conn.commit()
 
+    for i in range(len(chart)):
+        try:
+            song_title = chart[i].title
+            song_artist = chart[i].artist
+            cur.execute("""INSERT OR IGNORE INTO song_ids (Title, Artist) 
+                        VALUES (?, ?)""", (song_title, song_artist))
+        except Exception as e:
+            print(f"An error occurred: {e}")
 
+    conn.commit()
 
-
-def billboard_hot_100(date, cur, conn):
-
-    year = date[:4]  # Get the full year
-    table_name = f"Billboard_Hot_100_{year}"
-    create_table_query = f"""
-    CREATE TABLE IF NOT EXISTS {table_name} (
-        Rank INTEGER PRIMARY KEY, 
-        SongID INTEGER,
-        FOREIGN KEY(SongID) REFERENCES song_ids(ID)
-    )"""
-    cur.execute(create_table_query)
 def billboard_hot_100(date, cur, conn):
     song_list = []
     chart = billboard.ChartData('hot-100', date)
