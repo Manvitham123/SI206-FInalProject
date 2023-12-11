@@ -19,7 +19,7 @@ def create_data_base(database_name):
 
 
 def billboard_hot_100(date, cur, conn):
-    song_list = {}
+    song_list = []
     
     chart = billboard.ChartData('hot-100', date)
 
@@ -31,6 +31,7 @@ def billboard_hot_100(date, cur, conn):
     cur.execute(create_table_query)
     # conn.commit()
 
+
     cur.execute(f"SELECT MAX(Rank) FROM {table_name}")
     temp = cur.fetchone()[0]
     print(temp)
@@ -41,18 +42,19 @@ def billboard_hot_100(date, cur, conn):
         #   print(index)
         # info about top 100 songs
     for i in range(index,index+25):
-        song_per_date = []
-
+        #song_per_date = []
         song_title = chart[i].title
         song_artist = chart[i].artist
         song_rank = chart[i].rank 
             # tuple
-            #song_per_date.append((song_title, song_artist, song_rank))
+        song_list.append((song_title, song_artist, song_rank))
             #song_list[date] = song_per_date
         cur.execute(f"INSERT OR IGNORE INTO {table_name} (Rank, Title, Artist) VALUES (?,?,?)",
             (song_rank, song_title, song_artist)) 
 
         conn.commit()
+    return song_list
+
        
 
 
@@ -60,12 +62,11 @@ def main():
     # create_data_base --> create database for billboard data
     database_name = 'Billboard_Hot_100_Database'
     cur, conn = create_data_base(database_name)
-    
-
     # billboard_hot_100()
     date_list = ['2019-12-01', '2020-12-01']
     for date in date_list:
         hot_100_songs = billboard_hot_100(date, cur, conn)
+        print(hot_100_songs)
     
 
 main()
