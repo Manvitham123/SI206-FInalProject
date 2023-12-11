@@ -45,8 +45,15 @@ def valence_histogram_visualization(db_filename):
 # valence_histogram_visualization('average_valence.db')
 
 
+def average_audio_features(db_filename):
+    # bar plot depicting the average valence, danceability, mood between 2019 and 2020
 
 
 
 def main():
     valence_histogram_visualization('average_valence.db')
+
+
+# as valence increases, how does that influence the rank of the song? 
+# x = rank, y = valence. see how the value increases/decreases.
+# line gra[h]

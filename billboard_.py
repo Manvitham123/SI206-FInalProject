@@ -98,7 +98,7 @@ def main():
         print(data)
     
     
-    
-main()
+if __name__ == "__main__":
+    main()
 
 
