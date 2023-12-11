@@ -64,6 +64,7 @@ def main():
     cur, conn = create_data_base(database_name)
     # billboard_hot_100()
     date_list = ['2019-12-01', '2020-12-01']
+    # date_list = ['2019-12-01', '2020-04-01']
     for date in date_list:
         hot_100_songs = billboard_hot_100(date, cur, conn)
         print(hot_100_songs)
