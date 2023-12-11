@@ -3,6 +3,7 @@ import sqlite3
 import json
 import os
 import spotipy
+import re
 from spotipy.oauth2 import SpotifyClientCredentials
 cid = '72fbe8b5ea87405286fbc89b66e33d7e'
 secret = 'c021da7bc65a4d909e242dc52772637c'
@@ -153,11 +154,44 @@ def get_track_id(sp, title, artist):
     else:
         return None
 
+import re
+
+def clean_song_name(song_name):
+    if '$' in song_name:
+        song_name = song_name.replace('$', 's')
+    cleaned_name = song_name
+    if '(' in song_name:
+         cleaned_name = re.sub(r'\([^)]*\)', '', cleaned_name).strip()
+    #cleaned_name = re.sub(r'[^\w\s,]', '', song_name)  # Keeps letters, numbers, underscores, and whitespace
+    return cleaned_name
+
+def clean_artist_name(artist_name):
+    if "Featuring" in artist_name:
+            artist_name = artist_name.split(" Featuring")[0]
+    if ' x ' in artist_name:
+        artist_name = artist_name.replace('x', '&')
+    if ' X ' in artist_name:
+        artist_name = artist_name.replace('X', '&')
+    if ', ' in artist_name:
+         artist_name = artist_name.split(",")[0].strip()
+    if 'With ' in artist_name:
+         artist_name = artist_name.split("With")[0].strip()
+    if "Layton Greene" in artist_name:
+         artist_name = artist_name.replace('Layton Greene', 'Quality Control')
+    return artist_name
+
 
 def enhance_track_data(sp, track_list):
     enhanced_data = []
 
     for title, artist, rank in track_list:
+
+        artist = clean_artist_name(artist)
+        print(artist)
+        print(rank)
+        print(title)
+        title = clean_song_name(title)
+        print(title)
         track_id = get_track_id(sp, title, artist)
         audio_features = get_audio_features(sp, [track_id])
         processed_features = process_audio_features(audio_features)
@@ -218,7 +252,7 @@ def insert_covid_data(cur,conn, covid_data):
 def main():
     sp = get_spotify_client(cid, secret, "https://google.com/")
    # json_covid_data = fetch_covid_data("https://api.covidtracking.com")
-    json_spotify_data = fetch_top_songs(sp,2020)
+    #json_spotify_data = fetch_top_songs(sp,2020)
     #cur1, conn1 = set_up_database("spotify.db")
     #cur, conn = set_up_database("covid.db")
     #insert_covid_data(cur, conn, json_covid_data)
