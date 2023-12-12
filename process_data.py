@@ -30,6 +30,22 @@ def average_song_analysis_features(db_filename, table_2019, table_2020, audio_fe
         tuple_average_values_2020 += (average_value_2020,)
 
         # tuple --> averages of valence, danceability, energy... get mood by checking the valence level (return mood as str)
+        
+        # mood --> check valence level --> assign_mood function !
+        
+
+# def assign_mood(track_data):
+#     for track in track_data:
+#         if track['valence'] > 0.75:
+#             #track['mood'] = 'Happy'
+#             track['mood'] = 1
+#         elif track['valence'] < 0.25:
+#             #track['mood'] = 'Sad'
+#             track['mood'] = 2
+#         else:
+#             #track['mood'] = 'Neutral'
+#             track['mood'] = 3
+#     return track_data
 
     conn.close()
     print(tuple_average_values_2019, tuple_average_values_2020)
@@ -44,7 +60,8 @@ def main():
     table_2020 = 'Billboard_Hot_100_2020_Join'
 
     # column names from tables
-    audio_features_list = ['Valence', 'Danceability', 'Energy', 'Mood']
+    # audio_features_list = ['Valence', 'Danceability', 'Energy', 'Mood']
+    audio_features_list = ['Valence', 'Danceability', 'Energy']
 
     average_song_analysis_features(db_filename, table_2019, table_2020, audio_features_list)
 
