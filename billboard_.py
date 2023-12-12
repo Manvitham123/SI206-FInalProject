@@ -64,7 +64,7 @@ def billboard_hot_100(date, cur, conn):
         index = int(temp)
         print(index)
 
-    for i in range(index, index + 25):
+    for i in range(index, index + 10):
         song_title = chart[i].title
         song_artist = chart[i].artist
         song_rank = chart[i].rank
