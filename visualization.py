@@ -57,3 +57,6 @@ def main():
 # as valence increases, how does that influence the rank of the song? 
 # x = rank, y = valence. see how the value increases/decreases.
 # line gra[h]
+
+if __name__ == "__main__":
+    main()
