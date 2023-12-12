@@ -90,9 +90,9 @@ def billboard_hot_100(date, cur, conn):
 def main():
     # create_data_base --> create database for billboard data
     database_name = 'Billboard_Hot_100_Database'
-    database_name2 = 'spotify_analysis_Database'
+    #database_name2 = 'spotify_analysis_Database'
     cur, conn = create_data_base(database_name)
-    cur2, con2 = create_data_base(database_name2)
+    #cur2, con2 = create_data_base(database_name2)
     sp = get_spotify_client(cid, secret, "https://google.com/")
     # billboard_hot_100()
     date_list = ['2019-12-01', '2020-12-01']
@@ -100,7 +100,11 @@ def main():
     for date in date_list:
         hot_100_songs = billboard_hot_100(date, cur, conn)
         data = enhance_track_data(sp, hot_100_songs)
-        insert_spotify_data(cur2, con2, data)
+        insert_spotify_data(cur, conn, data)
+        year = date[:4]  # Get the full year
+        table_name = f"Billboard_Hot_100_{year}"
+        join_spotify_billboard(cur, conn, table_name)
+     
     
 if __name__ == "__main__":
     main()

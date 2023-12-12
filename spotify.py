@@ -223,7 +223,13 @@ def insert_spotify_data(cur,conn, spotify_data):
         cur.execute('INSERT OR IGNORE INTO Song_Analysis  (ID, Rank, Name, Artist, Valence, Danceability, Energy, Mood) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
                   song)
     conn.commit()
-
+def join_spotify_billboard(cur, conn, tableName):
+    secondTable = tableName+"_Join"
+    cur.execute(f'''CREATE TABLE IF NOT EXISTS {secondTable} AS
+                   SELECT b.*, s.Valence, s.Danceability, s.Energy, s.Mood
+                   FROM {tableName} b
+                   INNER JOIN Song_Analysis s ON b.SongID = s.ID''')
+    conn.commit()
 """
 def insert_covid_data(cur,conn, covid_data):
     cur.execute('''CREATE TABLE IF NOT EXISTS covid_data (
