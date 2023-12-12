@@ -24,7 +24,7 @@ def valence_histogram_visualization(db_filename):
     cursor = conn.cursor()
 
     # table name = average_valence
-    cursor.execute("SELECT year, valence_level FROM average_valence")
+    cursor.execute("SELECT year, valence_level FROM average_song_analysis_features")
     data = cursor.fetchall()
 
     # separate data for 2019 & 2020
@@ -41,7 +41,7 @@ def valence_histogram_visualization(db_filename):
     plt.legend()
     plt.show()
 
-# filename of database = average_valence
+# filename of database = average_valence??
 # valence_histogram_visualization('average_valence.db')
 
 
