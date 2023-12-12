@@ -16,7 +16,7 @@ import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 
 def create_spotify_oauth(client_id, client_secret, redirect_uri):
-    scope = "user-top-read"  # Add other scopes as needed
+    scope = "user-top-read" 
     return SpotifyOAuth(
         client_id=client_id,
         client_secret=client_secret,
@@ -38,47 +38,21 @@ def get_spotify_client(client_id, client_secret, redirect_uri):
 
     return spotipy.Spotify(auth=token_info['access_token'])
 
-def get_spotify_user_id(sp):
-    user_profile = sp.current_user()
-    return user_profile['id']
-
 def set_up_database(db_name):
         path = os.path.dirname(os.path.abspath(__file__))
         conn = sqlite3.connect(path + "/" + db_name)
         cur = conn.cursor()
         return cur, conn
  
-def search_playlist(sp, query, limit=10):
-    results = sp.search(q=query, type='playlist', limit=limit)
-    playlists = results['playlists']['items']
-    return [(playlist['name'], playlist['id']) for playlist in playlists]
-
-
-def fetch_top_songs(sp, year, limit=50):
-    year = 2020
-    playlists = search_playlist(sp, f"Your Top Songs {year}")[0]
-    top_songs = []
-    name = playlists[0]
-    playlist_id = playlists[1] 
-    results = sp.playlist_tracks(playlist_id, limit=50, offset=0)
-    top_songs = []
-    for item in results['items']:
-         track = item['track']
-         top_songs.append(get_track_features(track['id']))
-    return top_songs
-
-
 def get_track_features(id):
     metadata = sp.track(id)
     features = sp.audio_features(id)
-    # metadata
     name = metadata['name']
     album = metadata['album']['name']
     artist = metadata['album']['artists'][0]['name']
     release_date = metadata['album']['release_date']
     length = metadata['duration_ms']
     popularity = metadata['popularity']
-    # audio features
     acousticness = features[0]['acousticness']
     danceability = features[0]['danceability']
     energy = features[0]['energy']
@@ -114,8 +88,8 @@ def process_audio_features(audio_features):
             'id': feature['id'],
             'danceability': feature['danceability'],
             'energy': feature['energy'],
-            'valence': feature['valence'],  # a measure of musical positiveness
-            # Add other relevant features
+            'valence': feature['valence'], 
+
         }
         processed_data.append(track_data)
     return processed_data
@@ -123,7 +97,6 @@ def process_audio_features(audio_features):
 
 def assign_mood(track_data):
     for track in track_data:
-        # Example: Define mood based on valence
         if track['valence'] > 0.75:
             track['mood'] = 'Happy'
         elif track['valence'] < 0.25:
@@ -191,7 +164,7 @@ def enhance_track_data(sp, track_list):
         processed_features = process_audio_features(audio_features)
 
         if processed_features:
-            track_data = processed_features[0]  # Assuming we get one record per track ID
+            track_data = processed_features[0] 
             assign_mood([track_data])
 
             enhanced_data.append((
@@ -230,18 +203,7 @@ def join_spotify_billboard(cur, conn, tableName):
                    FROM {tableName} b
                    INNER JOIN Song_Analysis s ON b.SongID = s.ID''')
     conn.commit()
-"""
-def insert_covid_data(cur,conn, covid_data):
-    cur.execute('''CREATE TABLE IF NOT EXISTS covid_data (
-                date TEXT PRIMARY KEY,
-                infections INTEGER
-            )''')
-    for record in covid_data:
-        cur.execute('INSERT OR IGNORE INTO covid_data (date, infections) VALUES (?, ?)',
-                  (record['date'], record['infections']))
-    conn.commit()
 
-"""
 def main():
     sp = get_spotify_client(cid, secret, "https://google.com/")
    # json_covid_data = fetch_covid_data("https://api.covidtracking.com")
