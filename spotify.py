@@ -94,15 +94,27 @@ def process_audio_features(audio_features):
         processed_data.append(track_data)
     return processed_data
 
+def create_mood_table(cur, conn):
+    cur.execute('''CREATE TABLE IF NOT EXISTS Mood (
+                    MoodName TEXT PRIMARY KEY,
+                    MoodValue INTEGER
+                )''')
+    moods = [('Happy', 1), ('Neutral', 2), ('Sad', 3)]
+    for mood in moods:
+        cur.execute('INSERT OR IGNORE INTO Mood (MoodName, MoodValue) VALUES (?, ?)', mood)
+    conn.commit()
 
 def assign_mood(track_data):
     for track in track_data:
         if track['valence'] > 0.75:
-            track['mood'] = 'Happy'
+            #track['mood'] = 'Happy'
+            track['mood'] = 1
         elif track['valence'] < 0.25:
-            track['mood'] = 'Sad'
+            #track['mood'] = 'Sad'
+            track['mood'] = 2
         else:
-            track['mood'] = 'Neutral'
+            #track['mood'] = 'Neutral'
+            track['mood'] = 3
     return track_data
 
 def get_track_id(sp, title, artist):
@@ -122,7 +134,6 @@ def get_track_id(sp, title, artist):
 
     items = results['tracks']['items']
     if items:
-        # Assuming the first search result is the correct one
         return items[0]['id']
     else:
         return None
@@ -167,6 +178,7 @@ def enhance_track_data(sp, track_list):
             track_data = processed_features[0] 
             assign_mood([track_data])
 
+
             enhanced_data.append((
                 id,
                 rank, 
@@ -181,6 +193,7 @@ def enhance_track_data(sp, track_list):
     return enhanced_data
   
 def insert_spotify_data(cur,conn, spotify_data):
+
     cur.execute('''CREATE TABLE IF NOT EXISTS Song_Analysis (
                 ID TEXT PRIMARY KEY,
                 Rank INTEGER,
@@ -196,12 +209,27 @@ def insert_spotify_data(cur,conn, spotify_data):
         cur.execute('INSERT OR IGNORE INTO Song_Analysis  (ID, Rank, Name, Artist, Valence, Danceability, Energy, Mood) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
                   song)
     conn.commit()
+
 def join_spotify_billboard(cur, conn, tableName):
     secondTable = tableName+"_Join"
     cur.execute(f'''CREATE TABLE IF NOT EXISTS {secondTable} AS
                    SELECT b.*, s.Valence, s.Danceability, s.Energy, s.Mood
                    FROM {tableName} b
                    INNER JOIN Song_Analysis s ON b.SongID = s.ID''')
+    
+    cur.execute(f'''INSERT INTO {secondTable} (ID, Rank, Name, Artist, Valence, Danceability, Energy, Mood)
+                    SELECT b.ID, b.Rank, b.Name, b.Artist, s.Valence, s.Danceability, s.Energy, s.Mood
+                    FROM {tableName} b
+                    INNER JOIN Song_Analysis s ON b.SongID = s.ID
+                    ON CONFLICT(ID) DO UPDATE SET
+                    Rank = excluded.Rank,
+                    Name = excluded.Name,
+                    Artist = excluded.Artist,
+                    Valence = excluded.Valence,
+                    Danceability = excluded.Danceability,
+                    Energy = excluded.Energy,
+                    Mood = excluded.Mood''')
+  
     conn.commit()
 
 def main():

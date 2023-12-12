@@ -89,6 +89,7 @@ def main():
     cur, conn = create_data_base(database_name)
     sp = get_spotify_client(cid, secret, "https://google.com/")
     date_list = ['2019-12-01', '2020-12-01']
+    create_mood_table(cur, conn)
     for date in date_list:
         hot_100_songs = billboard_hot_100(date, cur, conn)
         data = enhance_track_data(sp, hot_100_songs)
