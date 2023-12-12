@@ -38,6 +38,7 @@ def valence_histogram_visualization(db_filename):
     plt.xlabel('Year')
     plt.ylabel('Valence Level')
     plt.title('Average Valence Levels for Top Songs of 2019 and 2020')
+    # add a key
     plt.legend()
     plt.show()
 
@@ -52,6 +53,7 @@ def average_audio_features(db_filename):
 
 def main():
     valence_histogram_visualization('average_valence.db')
+    
 
 
 # as valence increases, how does that influence the rank of the song? 
