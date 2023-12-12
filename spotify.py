@@ -53,6 +53,7 @@ def search_playlist(sp, query, limit=10):
     playlists = results['playlists']['items']
     return [(playlist['name'], playlist['id']) for playlist in playlists]
 
+
 def fetch_top_songs(sp, year, limit=50):
     year = 2020
     playlists = search_playlist(sp, f"Your Top Songs {year}")[0]
@@ -66,10 +67,10 @@ def fetch_top_songs(sp, year, limit=50):
          top_songs.append(get_track_features(track['id']))
     return top_songs
 
+
 def get_track_features(id):
     metadata = sp.track(id)
     features = sp.audio_features(id)
-
     # metadata
     name = metadata['name']
     album = metadata['album']['name']
@@ -91,7 +92,6 @@ def get_track_features(id):
              "danceability": danceability,"acousticness": acousticness, " danceability":danceability,"energy": energy,"instrumentalness": instrumentalness,"liveness": liveness, 
             "loudness": loudness,"speechiness": speechiness, "tempo": tempo, "time_signature":time_signature}
     return track
-
 
 
 import requests
@@ -180,18 +180,12 @@ def clean_artist_name(artist_name):
          artist_name = artist_name.replace('Layton Greene', 'Quality Control')
     return artist_name
 
-
 def enhance_track_data(sp, track_list):
     enhanced_data = []
 
-    for title, artist, rank in track_list:
-
+    for title, artist, rank, id in track_list:
         artist = clean_artist_name(artist)
-        print(artist)
-        print(rank)
-        print(title)
         title = clean_song_name(title)
-        print(title)
         track_id = get_track_id(sp, title, artist)
         audio_features = get_audio_features(sp, [track_id])
         processed_features = process_audio_features(audio_features)
@@ -201,9 +195,10 @@ def enhance_track_data(sp, track_list):
             assign_mood([track_data])
 
             enhanced_data.append((
+                id,
+                rank, 
                 title, 
                 artist, 
-                rank, 
                 track_data['valence'], 
                 track_data['danceability'], 
                 track_data['energy'], 
@@ -211,33 +206,25 @@ def enhance_track_data(sp, track_list):
             ))
 
     return enhanced_data
-"""
-def process_covid_data(covid_data):
-    processed_data = []
-    for record in covid_data:
-        covid_record = {
-            'date': record['date'],
-            'infections': record['positiveIncrease'],
-            # Add other relevant fields
-        }
-        processed_data.append(covid_record)
-    return processed_data
-
   
 def insert_spotify_data(cur,conn, spotify_data):
-    cur.execute('''CREATE TABLE IF NOT EXISTS top_songs (
-                id TEXT PRIMARY KEY,
-                name TEXT,
-                artist TEXT,
-                album TEXT,
-                release_date TEXT
+    cur.execute('''CREATE TABLE IF NOT EXISTS Song_Analysis (
+                ID TEXT PRIMARY KEY,
+                Rank INTEGER,
+                Name TEXT,
+                Artist TEXT,
+                Valence FLOAT,
+                Danceability FLOAT,
+                Energy  FLOAT,
+                Mood FLOAT
             )''')
+    
     for song in spotify_data:
-        cur.execute('INSERT OR IGNORE INTO top_songs (id, name, artist, album, release_date) VALUES (?, ?, ?, ?, ?)',
-                  (song['id'], song['name'], song['artist'], song['album'], song['release_date']))
+        cur.execute('INSERT OR IGNORE INTO Song_Analysis  (ID, Rank, Name, Artist, Valence, Danceability, Energy, Mood) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+                  song)
     conn.commit()
 
-
+"""
 def insert_covid_data(cur,conn, covid_data):
     cur.execute('''CREATE TABLE IF NOT EXISTS covid_data (
                 date TEXT PRIMARY KEY,

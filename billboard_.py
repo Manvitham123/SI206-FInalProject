@@ -12,11 +12,13 @@ from bs4 import BeautifulSoup
 import requests
 
 
+
 def create_data_base(database_name):
     db_name = f'{database_name}.db'
     conn = sqlite3.connect(db_name)
     cur = conn.cursor()
     return cur, conn
+
 
 
 def song_table(chart, cur, conn):
@@ -41,6 +43,7 @@ def song_table(chart, cur, conn):
 
     conn.commit()
 
+
 def billboard_hot_100(date, cur, conn):
     song_list = []
     chart = billboard.ChartData('hot-100', date)
@@ -49,8 +52,8 @@ def billboard_hot_100(date, cur, conn):
     table_name = f"Billboard_Hot_100_{year}"
     create_table_query = f"""
     CREATE TABLE IF NOT EXISTS {table_name} (
-        Rank INTEGER PRIMARY KEY, 
-        SongID INTEGER,
+        SongID INTEGER PRIMARY KEY, 
+        Rank INTEGER,
         FOREIGN KEY(SongID) REFERENCES song_ids(ID)
     )"""
     cur.execute(create_table_query)
@@ -69,11 +72,11 @@ def billboard_hot_100(date, cur, conn):
         song_rank = chart[i].rank
         cur.execute("SELECT ID FROM song_ids WHERE Title = ? AND Artist = ?", (song_title, song_artist))
         song_id_result = cur.fetchone()
-        song_list.append((song_title, song_artist, song_rank))
         if song_id_result:
             song_id = song_id_result[0]
+            song_list.append((song_title, song_artist, song_rank, song_id))
             # Insert the data into the Billboard_Hot_100_{year} table
-            cur.execute(f"INSERT OR IGNORE INTO {table_name} (Rank, SongID) VALUES (?, ?)", (song_rank, song_id))
+            cur.execute(f"INSERT OR IGNORE INTO {table_name} (SongID, Rank) VALUES (?, ?)", (song_id, song_rank))
 
         conn.commit()
 
@@ -87,7 +90,9 @@ def billboard_hot_100(date, cur, conn):
 def main():
     # create_data_base --> create database for billboard data
     database_name = 'Billboard_Hot_100_Database'
+    database_name2 = 'spotify_analysis_Database'
     cur, conn = create_data_base(database_name)
+    cur2, con2 = create_data_base(database_name2)
     sp = get_spotify_client(cid, secret, "https://google.com/")
     # billboard_hot_100()
     date_list = ['2019-12-01', '2020-12-01']
@@ -95,8 +100,7 @@ def main():
     for date in date_list:
         hot_100_songs = billboard_hot_100(date, cur, conn)
         data = enhance_track_data(sp, hot_100_songs)
-        print(data)
-    
+        insert_spotify_data(cur2, con2, data)
     
     
 main()
