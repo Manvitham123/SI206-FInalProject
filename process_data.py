@@ -22,12 +22,33 @@ def average_song_analysis_features(db_filename, table_2019, table_2020, audio_fe
         cur.execute(query_2019)
         average_value_2019 = cur.fetchone()[0]
         tuple_average_values_2019 += (average_value_2019,)
+    
 
         # data from 2020 table
         query_2020 = f"SELECT AVG({audio_feature}) FROM {table_2020}"
         cur.execute(query_2020)
         average_value_2020 = cur.fetchone()[0]
         tuple_average_values_2020 += (average_value_2020,)
+
+        if audio_feature == "Valence": 
+            if average_value_2019 > 0.75:
+               tuple_average_values_2019 += ('Happy',)
+                
+            elif average_value_2019 < 0.50:
+                tuple_average_values_2019 += ('Sad',)
+             
+            else:
+                tuple_average_values_2019 += ('Neutral',)
+            
+            if average_value_2020 > 0.75:
+               tuple_average_values_2020 += ('Happy',)
+                
+            elif average_value_2020 < 0.50:
+                tuple_average_values_2020 += ('Sad',)
+            
+            else:
+                tuple_average_values_2020 += ('Neutral',)
+    
 
         # tuple --> averages of valence, danceability, energy... get mood by checking the valence level (return mood as str)
         
@@ -48,6 +69,7 @@ def average_song_analysis_features(db_filename, table_2019, table_2020, audio_fe
 #     return track_data
 
     conn.close()
+    
     print(tuple_average_values_2019, tuple_average_values_2020)
     return tuple_average_values_2019, tuple_average_values_2020
 

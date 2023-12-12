@@ -109,7 +109,7 @@ def assign_mood(track_data):
         if track['valence'] > 0.75:
             #track['mood'] = 'Happy'
             track['mood'] = 1
-        elif track['valence'] < 0.25:
+        elif track['valence'] < 0.50:
             #track['mood'] = 'Sad'
             track['mood'] = 2
         else:
@@ -222,17 +222,12 @@ def join_spotify_billboard(cur, conn, billboard_table_name):
                    Energy FLOAT,
                    Mood FLOAT
                )''')
-
-    # Get the last SongID from the joined table
     cur.execute(f"SELECT MAX(SongID) FROM {join_table_name}")
     last_id_result = cur.fetchone()
     last_id = last_id_result[0] if last_id_result else None
-
-    # Determine the starting point in the Billboard table based on the last SongID
     next_id_condition = "WHERE b.SongID > ?" if last_id else ""
     next_id_values = (last_id,) if last_id else ()
 
-    # Append the new records from the Billboard table to the join table
     cur.execute(f'''INSERT INTO {join_table_name} (SongID, Rank, Valence, Danceability, Energy, Mood)
                     SELECT b.SongID, b.Rank, s.Valence, s.Danceability, s.Energy, s.Mood
                     FROM {billboard_table_name} b
