@@ -25,7 +25,6 @@ def valence_histogram_visualization(db_filename, table_2019, table_2020):
     plt.show()
 
 
-<<<<<<< HEAD
 # 2 --> line chart/scatterplot comparing the progression of song valence, danceability, energy level between 2019 and 2020
 def average_audio_features(db_filename, table_2019, table_2020):
     # bar plot depicting the average valence, danceability, mood between 2019 and 2020
@@ -62,7 +61,6 @@ def average_audio_features(db_filename, table_2019, table_2020):
     plt.grid(True)
     plt.show()
 
-=======
 def danceability_energy_scatterplot(filename, table_2019, table_2020):
     conn = sqlite3.connect(filename)
     cur = conn.cursor()
@@ -85,8 +83,6 @@ def danceability_energy_scatterplot(filename, table_2019, table_2020):
     plt.title('Comparison of Danceability and Energy Levels in 2019 and 2020')
     plt.legend()
     plt.show()
->>>>>>> 54710d7ff852038c7f3613144f70a9aad0bae486
-
 
 def main():
     db_filename = 'Billboard_Hot_100_Database.db'
@@ -94,7 +90,6 @@ def main():
     table_2020 = 'Billboard_Hot_100_2020_Join'
     valence_histogram_visualization(db_filename,table_2019, table_2020)
     danceability_energy_scatterplot(db_filename,table_2019, table_2020)
-
     average_audio_features(db_filename, table_2019, table_2020)
 
 
