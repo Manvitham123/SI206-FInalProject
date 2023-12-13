@@ -213,7 +213,6 @@ def insert_spotify_data(cur,conn, spotify_data):
 def join_spotify_billboard(cur, conn, billboard_table_name):
     join_table_name = billboard_table_name + "_Join"
 
-    # Create the join table structure if it doesn't exist
     cur.execute(f'''CREATE TABLE IF NOT EXISTS {join_table_name} (
                    SongID TEXT PRIMARY KEY,
                    Rank INTEGER,
@@ -240,13 +239,6 @@ def join_spotify_billboard(cur, conn, billboard_table_name):
 
 def main():
     sp = get_spotify_client(cid, secret, "https://google.com/")
-   # json_covid_data = fetch_covid_data("https://api.covidtracking.com")
-    #json_spotify_data = fetch_top_songs(sp,2020)
-    #cur1, conn1 = set_up_database("spotify.db")
-    #cur, conn = set_up_database("covid.db")
-    #insert_covid_data(cur, conn, json_covid_data)
-    #insert_spotify_data(cur1, conn1, json_spotify_data)
-   # conn1.close()
 if __name__ == "__main__":
     main()
    
