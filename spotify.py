@@ -111,17 +111,6 @@ def assign_mood(track_data):
     return track_data
 
 def get_track_id(sp, title, artist):
-    """
-    Fetch the Spotify track ID for a given song title and artist.
-
-    Args:
-    sp: Spotify API client instance.
-    title (str): The title of the song.
-    artist (str): The name of the artist.
-
-    Returns:
-    str: The Spotify track ID, or None if not found.
-    """
     query = f'track:{title} artist:{artist}'
     results = sp.search(q=query, type='track', limit=1)
 
