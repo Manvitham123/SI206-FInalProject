@@ -7,42 +7,49 @@ import unittest
 # 2 --> line chart/scatterplot comparing the progression of song valence, danceability, energy level between 2019 and 2020
 # val
 
-def valence_histogram_visualization(db_filename):
+def valence_histogram_visualization(db_filename, table_2019, table_2020):
     # histogram comparing the average valence level of 2019 & 2020
 
     conn = sqlite3.connect(db_filename)
     cursor = conn.cursor()
 
-    # table name = average_valence
-    cursor.execute("SELECT year, valence_level FROM average_song_analysis_features")
-    data = cursor.fetchall()
+    # average valence level for 2019
+    query_2019 = f"SELECT AVG({'Valence'}) FROM {table_2019}"
+    cursor.execute(query_2019)
+    average_valence_2019 = cursor.fetchone()[0]
 
-    # separate data for 2019 & 2020
-    data_2019 = [item[1] for item in data if item[0] == '2019']
-    data_2020 = [item[1] for item in data if item[0] == '2020']
+    # average valence level for 2020
+    query_2020 = f"SELECT AVG({'Valence'}) FROM {table_2020}"
+    cursor.execute(query_2020)
+    average_valence_2020 = cursor.fetchone()[0]
+
+    data = cursor.fetchall()
 
     conn.close()
 
     # plot histogram
-    plt.hist([data_2019, data_2020], color=['blue', 'gray'], label=['2019', '2020'])
+    years = ['2019', '2020']
+    average_valence_values = [average_valence_2019, average_valence_2020]
+
+    plt.bar(years, average_valence_values, color=['blue', 'gray'])
     plt.xlabel('Year')
-    plt.ylabel('Valence Level')
-    plt.title('Average Valence Levels for Top Songs of 2019 and 2020')
-    # add a key
-    plt.legend()
+    plt.ylabel('Average Valence Level')
+    plt.title('Average Valence Levels for 2019 and 2020')
     plt.show()
 
-# filename of database = average_valence??
-# valence_histogram_visualization('average_valence.db')
 
-
-def average_audio_features(db_filename):
-    # bar plot depicting the average valence, danceability, mood between 2019 and 2020
+# def average_audio_features(db_filename):
+#     # bar plot depicting the average valence, danceability, mood between 2019 and 2020
 
 
 
 def main():
-    valence_histogram_visualization('average_valence.db')
+    db_filename = 'Billboard_Hot_100_Database.db'
+
+    table_2019 = 'Billboard_Hot_100_2019_Join'
+    table_2020 = 'Billboard_Hot_100_2020_Join'
+    
+    valence_histogram_visualization(db_filename,table_2019, table_2020)
 
 
 
