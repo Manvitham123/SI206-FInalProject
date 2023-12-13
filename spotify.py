@@ -24,17 +24,10 @@ def create_spotify_oauth(client_id, client_secret, redirect_uri):
         scope=scope
     )
 
-# Use this function to get an authenticated Spotify object
 def get_spotify_client(client_id, client_secret, redirect_uri):
     sp_oauth = create_spotify_oauth(client_id, client_secret, redirect_uri)
     token_info = sp_oauth.get_cached_token()
 
-    if not token_info:
-        auth_url = sp_oauth.get_authorize_url()
-        print("Please navigate here and authorize:", auth_url)
-        response = input("Paste the redirect URL here: ")
-        code = sp_oauth.parse_response_code(response)
-        token_info = sp_oauth.get_access_token(code)
 
     return spotipy.Spotify(auth=token_info['access_token'])
 

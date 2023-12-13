@@ -46,8 +46,6 @@ def average_song_analysis_features(db_filename, table_2019, table_2020, audio_fe
 
     
     conn.close()
-    
-    print(tuple_average_values_2019, tuple_average_values_2020)
     return tuple_average_values_2019, tuple_average_values_2020
 
 def write_to_output_file(tuple_2019, tuple_2020, audio_features_list, output_filename):
@@ -70,7 +68,7 @@ def main():
 
     audio_features_list = ['Valence', 'Danceability', 'Energy']
     average_2019, average_2020 = average_song_analysis_features(db_filename, table_2019, table_2020, audio_features_list)
-    write_to_output_file(average_2019, average_2020, audio_features_list, "output.txt")
+    write_to_output_file(average_2019, average_2020, audio_features_list, "ProcessedData.txt")
 
 
 

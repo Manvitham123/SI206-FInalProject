@@ -17,8 +17,6 @@ def create_data_base(database_name):
     cur = conn.cursor()
     return cur, conn
 
-
-
 def song_table(chart, cur, conn):
     table_name = "song_ids"
     create_table_query = """
@@ -31,14 +29,10 @@ def song_table(chart, cur, conn):
     cur.execute(create_table_query)
 
     for i in range(len(chart)):
-        try:
             song_title = chart[i].title
             song_artist = chart[i].artist
             cur.execute("""INSERT OR IGNORE INTO song_ids (Title, Artist) 
                         VALUES (?, ?)""", (song_title, song_artist))
-        except Exception as e:
-            print(f"An error occurred: {e}")
-
     conn.commit()
 
 
@@ -57,12 +51,12 @@ def billboard_hot_100(date, cur, conn):
     cur.execute(create_table_query)
     cur.execute(f"SELECT MAX(Rank) FROM {table_name}")
     temp = cur.fetchone()[0]
-    print(temp)
+
     if not temp:
         index = 0
     else:
         index = int(temp)
-        print(index)
+
 
     for i in range(index, index + 10):
         song_title = chart[i].title
