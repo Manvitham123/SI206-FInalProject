@@ -2,14 +2,9 @@ import unittest
 import sqlite3
 import json
 import os
-
 import re
 
-# calculate average audio features for 2019 & 2020
 def average_song_analysis_features(db_filename, table_2019, table_2020, audio_features_list):
-
-    # return tuple of averages --> (valence, danceability, energy, mood)
-
     conn = sqlite3.connect(db_filename)
     cur = conn.cursor()
 
@@ -49,10 +44,21 @@ def average_song_analysis_features(db_filename, table_2019, table_2020, audio_fe
             else:
                 tuple_average_values_2020 += ('Neutral',)
 
+    
     conn.close()
     
     print(tuple_average_values_2019, tuple_average_values_2020)
     return tuple_average_values_2019, tuple_average_values_2020
+
+def write_to_output_file(tuple_2019, tuple_2020, audio_features_list, output_filename):
+    with open(output_filename, 'w') as file:
+        header_features_list = audio_features_list.copy()
+        header_features_list.insert(1, 'Mood')
+        file.write("Year, " + ", ".join(header_features_list) + "\n")
+        data_2019 = "2019, " + ", ".join(map(str, tuple_2019)) + "\n"
+        file.write(data_2019)
+        data_2020 = "2020, " + ", ".join(map(str, tuple_2020)) + "\n"
+        file.write(data_2020)
 
 
 
@@ -62,11 +68,9 @@ def main():
     table_2019 = 'Billboard_Hot_100_2019_Join'
     table_2020 = 'Billboard_Hot_100_2020_Join'
 
-    # column names from tables
-    # audio_features_list = ['Valence', 'Danceability', 'Energy', 'Mood']
     audio_features_list = ['Valence', 'Danceability', 'Energy']
-
-    average_song_analysis_features(db_filename, table_2019, table_2020, audio_features_list)
+    average_2019, average_2020 = average_song_analysis_features(db_filename, table_2019, table_2020, audio_features_list)
+    write_to_output_file(average_2019, average_2020, audio_features_list, "output.txt")
 
 
 
