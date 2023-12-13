@@ -12,14 +12,10 @@ def average_song_analysis_features(db_filename, table_2019, table_2020, audio_fe
     tuple_average_values_2020 = ()
 
     for audio_feature in audio_features_list:
-        # data from 2019 table
         query_2019 = f"SELECT AVG({audio_feature}) FROM {table_2019}"
         cur.execute(query_2019)
         average_value_2019 = cur.fetchone()[0]
         tuple_average_values_2019 += (average_value_2019,)
-    
-
-        # data from 2020 table
         query_2020 = f"SELECT AVG({audio_feature}) FROM {table_2020}"
         cur.execute(query_2020)
         average_value_2020 = cur.fetchone()[0]
@@ -29,7 +25,7 @@ def average_song_analysis_features(db_filename, table_2019, table_2020, audio_fe
             if average_value_2019 > 0.75:
                tuple_average_values_2019 += ('Happy',)
                 
-            elif average_value_2019 < 0.50:
+            elif average_value_2019 < 0.40:
                 tuple_average_values_2019 += ('Sad',)
              
             else:
@@ -38,7 +34,7 @@ def average_song_analysis_features(db_filename, table_2019, table_2020, audio_fe
             if average_value_2020 > 0.75:
                tuple_average_values_2020 += ('Happy',)
                 
-            elif average_value_2020 < 0.50:
+            elif average_value_2020 < 0.40:
                 tuple_average_values_2020 += ('Sad',)
             
             else:

@@ -102,7 +102,7 @@ def assign_mood(track_data):
         if track['valence'] > 0.75:
             #track['mood'] = 'Happy'
             track['mood'] = 1
-        elif track['valence'] < 0.50:
+        elif track['valence'] < 0.40:
             #track['mood'] = 'Sad'
             track['mood'] = 2
         else:
