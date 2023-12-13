@@ -43,11 +43,8 @@ def average_song_analysis_features(db_filename, table_2019, table_2020, audio_fe
             
             else:
                 tuple_average_values_2020 += ('Neutral',)
-<<<<<<< Updated upstream
 
-=======
     
->>>>>>> Stashed changes
     conn.close()
     
     print(tuple_average_values_2019, tuple_average_values_2020)
