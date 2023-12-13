@@ -76,6 +76,28 @@ def
 #     plt.show()
 
 
+def danceability_energy_scatterplot(filename, table_2019, table_2020):
+    conn = sqlite3.connect(filename)
+    cur = conn.cursor()
+    query_2019 = f"SELECT Danceability, Energy FROM {table_2019}"
+    cur.execute(query_2019)
+    data_2019 = cur.fetchall()
+    query_2020 = f"SELECT Danceability, Energy FROM {table_2020}"
+    cur.execute(query_2020)
+    data_2020 = cur.fetchall()
+    conn.close()
+    danceability_2019 = [item[0] for item in data_2019]
+    energy_2019 = [item[1] for item in data_2019]
+    danceability_2020 = [item[0] for item in data_2020]
+    energy_2020 = [item[1] for item in data_2020]
+    plt.figure(figsize=(10, 6))
+    plt.scatter(danceability_2019, energy_2019, color='blue', alpha=0.5, label='2019')
+    plt.scatter(danceability_2020, energy_2020, color='yellow', alpha=0.5, label='2020')
+    plt.xlabel('Danceability')
+    plt.ylabel('Energy')
+    plt.title('Comparison of Danceability and Energy Levels in 2019 and 2020')
+    plt.legend()
+    plt.show()
 
 def main():
     db_filename = 'Billboard_Hot_100_Database.db'
@@ -85,6 +107,7 @@ def main():
     
     valence_histogram_visualization(db_filename,table_2019, table_2020)
 
+    danceability_energy_scatterplot(db_filename,table_2019, table_2020)
     average_audio_features(db_filename, table_2019, table_2020)
 
 
