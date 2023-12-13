@@ -6,17 +6,15 @@ import unittest
 
 
 def valence_histogram_visualization(db_filename, table_2019, table_2020):
-    # histogram comparing the average valence level of 2019 & 2020
+
 
     conn = sqlite3.connect(db_filename)
     cursor = conn.cursor()
-
-    # average valence level for 2019
     query_2019 = f"SELECT AVG({'Valence'}) FROM {table_2019}"
     cursor.execute(query_2019)
     average_valence_2019 = cursor.fetchone()[0]
 
-    # average valence level for 2020
+
     query_2020 = f"SELECT AVG({'Valence'}) FROM {table_2020}"
     cursor.execute(query_2020)
     average_valence_2020 = cursor.fetchone()[0]
